@@ -1,4 +1,4 @@
-![image](https://github.com/06ED/tech_arrow_mobile/assets/113464840/9154e355-fb00-4fd3-b014-fbe6691486f8)## Настройка среды Flutter для Windows:
+# Настройка:
 
 1. Установите [Flutter SDK](https://docs.flutter.dev/get-started/install).
 2. Установите [Android Studio](https://developer.android.com/studio).
@@ -11,7 +11,7 @@
 - Dart SDK: 3.3.2
 - Android minSdkVersion: 21
 
-## Описание проекта:
+# Описание проекта:
 
 ## Технологии:
 
@@ -21,6 +21,7 @@
 - Python
 
 ## Скриншоты:
+
 ![image](https://github.com/06ED/tech_arrow_mobile/assets/113464840/9b96b0e5-e31b-455a-8877-26071abcaa37)
 
 ![image](https://github.com/06ED/tech_arrow_mobile/assets/113464840/d6060bf5-0d8a-4616-94e6-63f65d3d27df)
