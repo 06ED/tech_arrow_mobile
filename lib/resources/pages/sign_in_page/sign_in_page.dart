@@ -67,14 +67,14 @@ class _SignInPageState extends State<SignInPage> {
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: Color.fromARGB(255, 88, 181, 255),
+                      color: Colors.white,
                     ),
                   ),
                   Text(
                     'Войдите чтобы продолжить',
                     style: TextStyle(
                       fontSize: 16,
-                      color: Color.fromARGB(255, 88, 181, 255),
+                      color: Colors.white,
                     ),
                   ),
                   SizedBox(height: 50.0),
