@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/app/controllers/favorite_controller.dart';
 import 'package:flutter_app/resources/pages/navbar_pages/profile_page/tabs/favorite_places_tab.dart';
 import 'package:flutter_app/resources/pages/navbar_pages/profile_page/tabs/favorite_posts_tab.dart';
+import 'package:flutter_app/resources/pages/sign_in_page/sign_in_page.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 
 import '../../../../app/models/place.dart';
@@ -34,6 +35,12 @@ class _ProfilePageState extends NyState<ProfilePage> {
         appBar: AppBar(
           title: Text('Ваш профиль'),
           backgroundColor: Color.fromARGB(255, 88, 181, 255),
+          leading: GestureDetector(
+            onTap: () async {
+              await Auth.logout();
+routeTo(SignInPage.path, navigationType: NavigationType.pushReplace);
+            },
+            child: Icon(Icons.exit_to_app),),
         ),
         body: Column(
           children: [

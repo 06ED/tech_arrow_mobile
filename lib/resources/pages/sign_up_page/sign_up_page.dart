@@ -18,6 +18,8 @@ class _SignUpPageState extends State<SignUpPage> {
   final _passwordController = TextEditingController();
   final _repeatPasswordController = TextEditingController();
 
+  final _formKey = GlobalKey<FormState>(); // GlobalKey для формы
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -67,31 +69,56 @@ class _SignUpPageState extends State<SignUpPage> {
                 SizedBox(height: 40.0),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: Column(
-                    children: [
-                      MyTextField(
-                        controller: _emailController,
-                        labelText: 'Почта',
-                        label: 'Почта',
-                        height: 45,
-                      ),
-                      SizedBox(height: 20.0),
-                      MyTextField(
-                        controller: _passwordController,
-                        labelText: 'Пароль',
-                        label: 'Пароль',
-                        height: 45,
-                      ),
-                      SizedBox(
-                        height: 20,
-                      ),
-                      MyTextField(
-                        controller: _repeatPasswordController,
-                        labelText: 'Повторите пароль',
-                        label: 'Повторите пароль',
-                        height: 45,
-                      ),
-                    ],
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      children: [
+                        MyTextField(
+                          controller: _emailController,
+                          labelText: 'Почта',
+                          height: 50,
+                          validate: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Пожалуйста, введите вашу почту';
+                            }
+                            if (!isValidEmail(value)) {
+                              return 'Пожалуйста, введите корректный адрес электронной почты';
+                            }
+                            return null; // Возвращаем null, если валидация успешна
+                          },
+                        ),
+                        SizedBox(height: 20.0),
+                        MyTextField(
+                          controller: _passwordController,
+                          labelText: 'Пароль',
+                          height: 50,
+                          validate: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Пожалуйста, введите ваш пароль';
+                            }
+                            // Дополнительные проверки пароля могут быть добавлены здесь
+                            return null; // Возвращаем null, если валидация успешна
+                          },
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        MyTextField(
+                          controller: _repeatPasswordController,
+                          labelText: 'Повторите пароль',
+                          height: 50,
+                          validate: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Пожалуйста, повторите ваш пароль';
+                            }
+                            if (value != _passwordController.text) {
+                              return 'Пароли не совпадают';
+                            }
+                            return null; // Возвращаем null, если валидация успешна
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 SizedBox(height: 30.0),
@@ -118,27 +145,40 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                     ElevatedButton(
                       onPressed: () async {
-                        if (_passwordController.text !=
-                            _repeatPasswordController.text) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text("Пароли не совпадают")));
-                          return;
-                        }
+                        if (_formKey.currentState!.validate()) {
+                          // Проверяем совпадение паролей
+                          if (_passwordController.text !=
+                              _repeatPasswordController.text) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text("Пароли не совпадают")),
+                            );
+                            return;
+                          }
 
-                        await widget.controller.register(
-                          _emailController.text,
-                          _passwordController.text,
-                        );
-                        await Auth.login(User(_emailController.text));
-                        routeTo(DashboardPage.path);
+                          // Регистрация пользователя
+                          await widget.controller.register(
+                            _emailController.text,
+                            _passwordController.text,
+                          );
+
+                          // Вход пользователя после успешной регистрации
+                          await Auth.login(User(_emailController.text));
+
+                          // Переход на страницу Dashboard
+                          routeTo(DashboardPage.path);
+                        }
                       },
                       child: Text('Регистрация'),
                       style: ButtonStyle(
                         backgroundColor: MaterialStateProperty.all(
-                            Color.fromARGB(255, 148, 207, 255)),
-                        shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                          Color.fromARGB(255, 148, 207, 255),
+                        ),
+                        shape: MaterialStateProperty.all(
+                          RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10.0),
-                            side: BorderSide(color: Colors.white))),
+                            side: BorderSide(color: Colors.white),
+                          ),
+                        ),
                       ),
                     ),
                   ],
@@ -149,5 +189,12 @@ class _SignUpPageState extends State<SignUpPage> {
         ],
       ),
     );
+  }
+
+  bool isValidEmail(String email) {
+    final bool emailValid = RegExp(
+            r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+        .hasMatch(email);
+    return emailValid;
   }
 }

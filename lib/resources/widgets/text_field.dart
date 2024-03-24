@@ -15,7 +15,7 @@ class MyTextField extends StatefulWidget {
   final Widget? helperWidget;
   final bool showQuestionMark;
   final VoidCallback? onQuestionPressed;
-  final Function(String)? validate;
+  final String? Function(String?)? validate;
   final double height;
   final TextEditingController controller;
 
@@ -36,7 +36,8 @@ class MyTextField extends StatefulWidget {
     this.showQuestionMark = true,
     this.onQuestionPressed,
     this.validate,
-    this.height=30, required String label, required this.controller,
+    this.height = 30,
+    required this.controller,
   }) : super(key: key);
 
   @override
@@ -46,11 +47,20 @@ class MyTextField extends StatefulWidget {
 class _MyTextFieldState extends State<MyTextField> {
   late FocusNode _focusNode;
   TextEditingController _controller = TextEditingController();
+  String? _errorText;
 
   @override
   void initState() {
     super.initState();
     _focusNode = FocusNode();
+    _controller = widget.controller;
+    _controller.addListener(() {
+      if (_errorText != null) {
+        setState(() {
+          _errorText = null;
+        });
+      }
+    });
   }
 
   @override
@@ -67,22 +77,23 @@ class _MyTextFieldState extends State<MyTextField> {
       children: [
         Container(
           height: widget.height,
-          child: TextField(
-            controller: widget.controller,
+          child: TextFormField(
+            controller: _controller,
+            focusNode: _focusNode,
             style: TextStyle(
               color: _focusNode.hasFocus ? widget.focusColor : widget.textColor,
             ),
             decoration: InputDecoration(
               labelText: widget.labelText,
               labelStyle: TextStyle(
-                color:
-                    _focusNode.hasFocus ? widget.focusColor : widget.hintColor,
+                color: _focusNode.hasFocus ? widget.focusColor : widget.hintColor,
               ),
               hintText: widget.hintText,
               hintStyle: TextStyle(
                 color: widget.hintColor,
                 fontSize: 14,
               ),
+              errorText: _errorText,
               border: OutlineInputBorder(
                 borderSide: BorderSide(
                   color: widget.hintColor,
@@ -90,17 +101,19 @@ class _MyTextFieldState extends State<MyTextField> {
                 ),
                 borderRadius: BorderRadius.circular(widget.borderRadius),
               ),
-              // focusedBorder: OutlineInputBorder(
-              //   borderSide: BorderSide(
-              //     color: widget.focusColor,
-              //     width: widget.borderWidthFocused,
-              //   ),
-              //   borderRadius: BorderRadius.circular(widget.borderRadius),
-              // ),
               filled: true,
-              fillColor:
-                  _focusNode.hasFocus ? widget.fillColor : (widget.fillColor),
+              fillColor: _focusNode.hasFocus ? widget.fillColor : (widget.fillColor),
             ),
+            validator: (value) {
+              if (widget.validate != null) {
+                // Если есть функция валидации, вызываем ее и обновляем состояние ошибки
+                setState(() {
+                  _errorText = widget.validate!(value);
+                });
+                return _errorText; // Возвращаем текст ошибки, если есть
+              }
+              return null; // Возвращаем null, если нет ошибок
+            },
           ),
         ),
       ],
